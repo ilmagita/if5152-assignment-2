@@ -43,7 +43,7 @@ def computeH(x1, x2):
 	# get the least-square solution of Ah = 0 which is in column 9 of matrix V
 	# remember that previously we got v_T, so we have to transpose that again
 	H2to1 = np.reshape(v_T.T[:, 8], (3, 3))
-
+	print(f'computeH: finished with H2to1: {H2to1}')
 	return H2to1
 
 
@@ -83,7 +83,7 @@ def computeH_norm(x1, x2):
 	# TODO: Denormalization
 	T1_inv = np.linalg.inv(T1)
 	H2to1 = T1_inv @ H2to1_normalized @ T2
-
+	print(f'computeH_norm: finished with H2to1: {H2to1}')
 	return H2to1
 
 
@@ -128,25 +128,26 @@ def computeH_ransac(locs1, locs2):
 		if np.sum(temp_inliers) > np.sum(inliers):
 			inliers = temp_inliers
 			bestH2to1 = H2to1
-
+	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
 	return bestH2to1, inliers
 
 
-# def compositeH(H2to1, template, img):
-# 	# NOTES
-# 	# Create a composite image after warping the template image on top of the image using the homography
-# 	# Note that the homography we compute is from the image to the template;
-# 	# x_template = H2to1*x_photo
-# 	# For warping the template to the image, we need to invert it.
+def compositeH(H2to1, template, img):
+    # create a mask of the same size as the template
+    mask = np.ones(template.shape[:2], dtype=np.uint8) * 255
 
-# 	# TODO: Create mask of same size as template
+    # warp the mask with the inverse homography
+    warp_mask = cv2.warpPerspective(mask, H2to1, (img.shape[1], img.shape[0]))
 
-# 	# TODO: Warp mask by appropriate homography
+    # warp the template image with the homography
+    warp_template = cv2.warpPerspective(template, H2to1, (img.shape[1], img.shape[0]))
 
-# 	# TODO: Warp template by appropriate homography
+    # Combine the images using the mask
+    img_background = cv2.bitwise_and(img, img, mask=cv2.bitwise_not(warp_mask))
+    img_foreground = cv2.bitwise_and(warp_template, warp_template, mask=warp_mask)
 
-# 	# TODO: Use mask to combine the warped template and the image
-	
-# 	return composite_img
+    # Combine the foreground and background images
+    composite_img = cv2.add(img_background, img_foreground)
 
+    return composite_img
 

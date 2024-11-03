@@ -8,8 +8,8 @@ import time
 
 def matchPics(I1, I2):
     # adjust sigma and ratio
-	sigma = 0.025
-	ratio = 0.65
+	sigma = 0.715
+	ratio = 1.0
  
 	# start timing
 	start_time = time.time()
@@ -38,6 +38,6 @@ def matchPics(I1, I2):
 	end_time = time.time()
 	duration = end_time - start_time
  
-	print(f'Finished computing {len(matches)} matches with sigma = {sigma} and ratio = {ratio} for {duration}.')
+	print(f'matchPics: Finished computing {len(matches)} matches with sigma = {sigma} and ratio = {ratio} for {duration:.3f} seconds.')
 
 	return matches, locs1, locs2
