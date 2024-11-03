@@ -2,102 +2,122 @@ import numpy as np
 import cv2
 
 def computeH(x1, x2):
-	# Q2.2.1
-	# TODO: Compute the homography between two sets of points
-
-	# x1, x2: N x 2 matrixes
-	# x1 = H x2
-	# when calculating H, we are actually solving A * h = 0, and A is the matrix from the coordinates of the two images
-
-	N = len(x1)
-	A_elements = np.zeros((N*2, 9))
- 
-	if N < 4:
-		raise ValueError("At least 4 points are required to compute homography.")
-
-	# we must now write the points as 2 x 9 matrices, so the A matrix will be (N x 2) x 9 matrices
-	for i in range(N):
-		# indices [i][0] account for the x-coordinate, while indices [i][1] account for the y-coordinate
-		x1_x, x1_y = x1[i]	
-		x2_x, x2_y = x2[i] 
-
-		row_1 = [x2_x, x2_y, 1, 0, 0, 0, -x1_x * x2_x, -x1_x * x2_y, -x1_x]
-		row_2 = [0, 0, 0, x2_x, x2_y, 1, -x1_y * x2_x, -x1_y * x2_y, -x1_y]
-		A_elements[2 * i] = row_1
-		A_elements[2 * i + 1] = row_2
-
-	A = A_elements
-
-	# the next step should be calculating eigenvalues, but we can't be sure to calculating eigenvalues when our matrix could be not square-shaped
-	# thus, we will use the SVD approach, where matrix A = USV
-	# U = left singular vectors, in which the columns are A(A^T)
-	# S = diagonal matrix, in which each diagonal element is the singular value
-	# V = right singular vectors, in which the columns are (A^T)A
-	# but in python:
-	# u = left singular vectors of (A^T)A
-	# s = singular values of (A^T)A
-	# v = right singular vectors of (A^T)A, returned as v^T
- 
-	_, _, v_T = np.linalg.svd(A.T @ A)
-
-	# get the least-square solution of Ah = 0 which is in column 9 of matrix V
-	# remember that previously we got v_T, so we have to transpose that again
-	H2to1 = np.reshape(v_T.T[:, 8], (3, 3))
-	print(f'computeH: finished with H2to1: {H2to1}')
-	return H2to1
-
+    # Q2.2.1
+    # TODO: Compute the homography between two sets of points
+    
+    # INPUTS
+    # x1 : N x 2 matrix; coordinates of point pairs between two images in image 1
+    # x2 : N x 2 matrix; coordinates of point pairs between two images in image 2
+    
+    # OUTPUTS
+    # H2to1 : 3 x 3 matrix; best homography from image 2 to 1 in the least-square sense
+    
+    x1 = x1.T
+    x2 = x2.T
+    
+    N = len(x1)
+    if N < 4:
+        raise ValueError('At least 4 points required to compute homography.')
+    
+    A = np.zeros([2 * N, 9])
+    for i in range(N):
+        x1_xi = x1[i, 0] # x coordinate in x1
+        x1_yi = x1[i, 1] # y coordinate in x1
+        x2_xi = x2[i, 0] # x coordinate in x2
+        x2_yi = x2[i, 1] # y coordinate in x2
+        A[2*i] = [x2_xi, x2_yi, 1, 0, 0, 0, -x1_xi * x2_xi, -x1_xi * x2_yi, -x1_xi]
+        A[2*i + 1] = [0, 0, 0, x2_xi, x2_yi, 1, -x1_yi * x2_xi, -x1_yi * x2_yi, -x1_yi]
+    
+    _, _, V_t = np.linalg.svd(A)
+    smallest_eigenvector = V_t[-1, :]
+    H2to1 = smallest_eigenvector.reshape(3,3)
+    return H2to1
 
 def computeH_norm(x1, x2):
 	# Q2.2.2
 	# TODO: Compute the centroid of the points
-	x1_centroid = np.mean(x1, axis = 0)
-	x2_centroid = np.mean(x2, axis = 0)
-
-	# TODO: Shift the origin of the points to the centroid
-	x1_moved = x1 - x1_centroid
-	x2_moved = x2 - x2_centroid
-
+ 
+	# INPUTS
+    # x1 : N x 2 matrix; coordinates of point pairs between two images in image 1
+    # x2 : N x 2 matrix; coordinates of point pairs between two images in image 2
+	
+	# OUTPUTS
+	# H2to1 : 3 x 3 matrix; best homography from image 2 to 1 in the least-square sense
+ 
+	# TODO: Shift so centroid is at the origin
 	# TODO: Normalize the points so that the largest distance from the origin is equal to sqrt(2)
-	x1_scale = np.sqrt(2) / (np.max(np.linalg.norm(x1_moved,axis=1)))
-	x2_scale = np.sqrt(2) / (np.max(np.linalg.norm(x2_moved,axis=1)))
-	x1_norm = x1_scale * x1_moved
-	x2_norm = x2_scale * x2_moved
+ 
+	print('Starting computeH_norm')
+	print(f'computeH_norm >> x1:\n{x1}')
+	print(f'computeH_norm >> x2:\n{x2}')
+    
+	mean_x1_x = np.mean(x1, axis = 0)[0]
+	mean_x1_y = np.mean(x1, axis = 0)[0]
+	mean_x2_x = np.mean(x2, axis = 0)[0]
+	mean_x2_y = np.mean(x2, axis = 0)[0]
+ 
+	N = len(x1)
+	s_x1 = np.zeros(N)
+	s_x2 = np.zeros(N)
+ 
+	for i in range(N):
+		s_x1[i] = np.sqrt((x1[i, 0] - mean_x1_x) ** 2 + (x1[i, 1] - mean_x1_y) ** 2)
+		s_x2[i] = np.sqrt((x2[i, 0] - mean_x2_x) ** 2 + (x2[i, 1] - mean_x2_y) ** 2)
+
+	x1_scale = np.sqrt(2)/np.amax(s_x1)
 
 	# TODO: Similarity transform 1: scale and shift (translate) the origin
+	# T1 = scaling matrix (dot) translation matrix
 	T1 = np.array([
-		[x1_scale, 0, -x1_scale * x1_centroid[0]],
-		[0, x1_scale, -x1_scale * x1_centroid[1]],
+		[x1_scale, 0, -x1_scale * mean_x1_x],
+		[0, x1_scale, -x1_scale * mean_x1_y],
 		[0, 0, 1]
 	])
+	x1_hom = np.hstack((x1, np.ones((len(x1), 1))))
+	print(f'computeH_norm >> x1_hom:\n{x1_hom}')
+	x1_hom = T1 @ x1_hom.T
+	print(f'computeH_norm >> x1_hom after transformed:\n{x1_hom}')
 
 	# TODO: Similarity transform 2
+	x2_scale = np.sqrt(2)/np.amax(s_x2)
 	T2 = np.array([
-		[x2_scale, 0, -x2_scale * x2_centroid[0]],
-		[0, x2_scale, -x2_scale * x2_centroid[1]],
+		[x2_scale, 0, -x2_scale * mean_x2_x],
+		[0, x2_scale, -x2_scale * mean_x2_y],
 		[0, 0, 1]
 	])
-
+	x2_hom = np.hstack((x2, np.ones((len(x1), 1))))
+	print(f'computeH_norm >> x2_hom: {x2_hom}')
+	x2_hom = T2 @ x2_hom.T
+	print(f'computeH_norm >> x2_hom after transformed:\n{x2_hom}')
+ 
 	# TODO: Compute homography
-	H2to1_normalized = computeH(x1_norm, x2_norm)
+	H2to1_normalized = computeH(x1_hom, x2_hom)
+	print(f'computeH_norm >> H2to1_normalized:\n{H2to1_normalized}')
 
 	# TODO: Denormalization
-	T1_inv = np.linalg.inv(T1)
-	H2to1 = T1_inv @ H2to1_normalized @ T2
-	print(f'computeH_norm: finished with H2to1: {H2to1}')
+	H2to1 = np.linalg.inv(T2) @ H2to1_normalized @ T1
+	print(f'computeH_norm >> finished with H2to1: {H2to1}')
 	return H2to1
-
 
 def computeH_ransac(locs1, locs2):
 	# Q2.2.3
 	# TODO: Compute the best fitting homography given a list of matching points
  
+ 	# INPUTS
+	# locs1 : N x 2 matrix, each row has (x, y) of a feature point
+	# locs2 : N x 2 matrix, each row has (x, y) of a feature point
+ 
+	# OUTPUTS
+	# bestH2to1 : best homography designated by ransac algorithm
+	# inliers : vector of length N with a 1 at matches
+ 
+	# SET VARIABLES
+	iters = 700 # number of RANSAC iterations
+	thres = 2.0 # threshold to determine inliers
+ 
 	N = len(locs1)
 	inliers = np.zeros((N, 1))
 	bestH2to1 = np.zeros((3,3))
- 
-	# variables
-	iters = 1000 # number of RANSAC iterations
-	thres = 2.0 # threshold to determine inliers
  
 	for i in range(iters):
 		# pick 4 random points
@@ -131,6 +151,81 @@ def computeH_ransac(locs1, locs2):
 	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
 	return bestH2to1, inliers
 
+# def computeH_ransac(locs1, locs2):
+# 	# Q2.2.3
+# 	# TODO: Compute the best fitting homography given a list of matching points
+ 
+# 	# INPUTS
+# 	# locs1 : N x 2 matrix, each row has (x, y) of a feature point
+# 	# locs2 : N x 2 matrix, each row has (x, y) of a feature point
+ 
+# 	# OUTPUTS
+# 	# bestH2to1 : best homography designated by ransac algorithm
+# 	# inliers : vector of length N with a 1 at matches
+ 
+# 	# SET VARIABLES
+# 	iters = 700 # number of RANSAC iterations
+# 	thres = 2.0 # threshold to determine inliers
+ 
+# 	print('Starting computeH_ransac')
+ 
+# 	N = len(locs1)
+# 	inliers = np.zeros((N))
+# 	bestH2to1 = np.zeros((3, 3))
+# 	max_inliers = -999
+
+# 	x1_hom = np.hstack((locs1, np.ones((len(locs1), 1))))
+# 	x2_hom = np.hstack((locs2, np.ones((len(locs2), 1))))
+ 
+# 	# RANSAC ALGORITHM
+# 	for i in range(iters):
+# 		print(f'computeH_ransac >> iteration-{i+1}')
+
+# 		total_inliers = 0
+
+# 		# pick 4 random points
+# 		idx = np.random.randint(0, N, size = 4)
+# 		print(f'computeH_ransac >> random idxs: {idx}')
+  
+# 		x1 = locs1[idx, :]
+# 		x2 = locs2[idx, :]
+
+# 		print(f'computeH_ransac >> chosen x1: {x1}')
+# 		print(f'computeH_ransac >> chosen x2: {x2}')
+  
+# 		# compute homography
+# 		H2to1 = computeH_norm(x1, x2)
+# 		temp_inliers = np.zeros(N)
+  
+# 		print(f'computeH_ransac >> current H2to1: {H2to1}')
+# 		print(f'computeH_ransac >> temp_inliers: {temp_inliers}')
+  
+# 		# transform the points so we can see where points in locs2 would appear in locs1
+# 		for j in range(len(x2_hom)):
+
+# 			# apply homography transformation
+# 			x2_calc = np.dot(H2to1, x1_hom[j].T)
+
+# 			if x2_calc[2] != 0:
+# 				x2_calc[0] /= x2_calc[2]
+# 				x2_calc[1] /= x2_calc[2]
+    
+# 				error_1 = x2_hom[j][0] - x2_calc[0]
+# 				error_2 = x2_hom[j][1] - x2_calc[1]
+# 				error = np.linalg.norm([error_1, error_2])
+    
+# 				if error <= thres:
+# 					temp_inliers[j] = 1
+# 					total_inliers = total_inliers + 1
+     
+# 		if total_inliers > max_inliers:
+# 			max_inliers = total_inliers
+# 			bestH2to1 = H2to1
+# 			inliers = temp_inliers.copy()
+   
+# 	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
+# 	return bestH2to1, inliers
+
 
 def compositeH(H2to1, template, img):
     # create a mask of the same size as the template
@@ -142,11 +237,11 @@ def compositeH(H2to1, template, img):
     # warp the template image with the homography
     warp_template = cv2.warpPerspective(template, H2to1, (img.shape[1], img.shape[0]))
 
-    # Combine the images using the mask
+    # combine the images using the mask
     img_background = cv2.bitwise_and(img, img, mask=cv2.bitwise_not(warp_mask))
     img_foreground = cv2.bitwise_and(warp_template, warp_template, mask=warp_mask)
 
-    # Combine the foreground and background images
+    # combine the foreground and background images
     composite_img = cv2.add(img_background, img_foreground)
 
     return composite_img

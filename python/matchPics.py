@@ -8,9 +8,9 @@ import time
 
 def matchPics(I1, I2):
     # adjust sigma and ratio
-	sigma = 0.715
-	ratio = 1.0
- 
+	sigma = 0.25
+	ratio = 0.8
+
 	# start timing
 	start_time = time.time()
  

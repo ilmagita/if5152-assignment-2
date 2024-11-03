@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 #Q2.1.5
 #Read the image and convert to grayscale, if necessary
+
 I = cv2.imread('data/cv_cover.jpg')
 if len(I.shape) == 3:
 	I = skimage.color.rgb2gray(I)
@@ -28,8 +29,8 @@ for i in range(36):
 	print(f'Matching at rotation {i*10} degrees done.')
 
 #Display histogram
-plt.bar(rotations, matches_count, density=True, color='blue', alpha=0.6)
-plt.xlabel("Count of Matches")
-plt.ylabel("Rotation in Degrees")
+plt.bar(rotations, matches_count, color='blue', alpha=0.6)
+plt.xlabel("Degree of Rotations")
+plt.ylabel("Matches Count")
 plt.title("Rotations vs. Number of Matches")
 plt.show()

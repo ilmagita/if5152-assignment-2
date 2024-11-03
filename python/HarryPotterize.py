@@ -5,7 +5,7 @@ import skimage.color
 
 # TODO: Import necessary functions
 from matchPics import matchPics
-from planarH import computeH_ransac, computeH, computeH_norm
+from planarH import computeH_ransac
 from planarH import compositeH
 
 # TODO: Write script for Q2.2.4
@@ -20,12 +20,14 @@ hp_cover = cv2.imread('../data/hp_cover.jpg')
 hp_cover_resized = cv2.resize(hp_cover, dsize=(cv_cover.shape[1], cv_cover.shape[0]))
 
 # match it accordingly
-matches, locs1, locs2 = matchPics(cv_desk, cv_cover)
+matches, locs1, locs2 = matchPics(cv_cover, cv_desk)
+print('Done doing matchPics with cv_desk and cv_cover')
 
 locs1 = locs1[matches[:,0], 0:2]
 locs2 = locs2[matches[:,1], 0:2]
 
 H2to1, inliers = computeH_ransac(locs1, locs2)
+print('Done computing Homography with RANSAC algorithm')
 
 # Warps hp_cover.jpg to the dimension of cv_desk.png using skimage function skimage.transform.warp
 warped_img = cv2.warpPerspective(hp_cover_resized, H2to1, dsize=(cv_desk.shape[1], cv_desk.shape[0]))
