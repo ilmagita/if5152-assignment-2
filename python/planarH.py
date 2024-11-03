@@ -28,7 +28,7 @@ def computeH(x1, x2):
         A[2*i] = [x2_xi, x2_yi, 1, 0, 0, 0, -x1_xi * x2_xi, -x1_xi * x2_yi, -x1_xi]
         A[2*i + 1] = [0, 0, 0, x2_xi, x2_yi, 1, -x1_yi * x2_xi, -x1_yi * x2_yi, -x1_yi]
     
-    _, _, V_t = np.linalg.svd(A)
+    _, _, V_t = np.linalg.svd(A.T @ A)
     smallest_eigenvector = V_t[-1, :]
     H2to1 = smallest_eigenvector.reshape(3,3)
     return H2to1
@@ -150,82 +150,6 @@ def computeH_ransac(locs1, locs2):
 			bestH2to1 = H2to1
 	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
 	return bestH2to1, inliers
-
-# def computeH_ransac(locs1, locs2):
-# 	# Q2.2.3
-# 	# TODO: Compute the best fitting homography given a list of matching points
- 
-# 	# INPUTS
-# 	# locs1 : N x 2 matrix, each row has (x, y) of a feature point
-# 	# locs2 : N x 2 matrix, each row has (x, y) of a feature point
- 
-# 	# OUTPUTS
-# 	# bestH2to1 : best homography designated by ransac algorithm
-# 	# inliers : vector of length N with a 1 at matches
- 
-# 	# SET VARIABLES
-# 	iters = 700 # number of RANSAC iterations
-# 	thres = 2.0 # threshold to determine inliers
- 
-# 	print('Starting computeH_ransac')
- 
-# 	N = len(locs1)
-# 	inliers = np.zeros((N))
-# 	bestH2to1 = np.zeros((3, 3))
-# 	max_inliers = -999
-
-# 	x1_hom = np.hstack((locs1, np.ones((len(locs1), 1))))
-# 	x2_hom = np.hstack((locs2, np.ones((len(locs2), 1))))
- 
-# 	# RANSAC ALGORITHM
-# 	for i in range(iters):
-# 		print(f'computeH_ransac >> iteration-{i+1}')
-
-# 		total_inliers = 0
-
-# 		# pick 4 random points
-# 		idx = np.random.randint(0, N, size = 4)
-# 		print(f'computeH_ransac >> random idxs: {idx}')
-  
-# 		x1 = locs1[idx, :]
-# 		x2 = locs2[idx, :]
-
-# 		print(f'computeH_ransac >> chosen x1: {x1}')
-# 		print(f'computeH_ransac >> chosen x2: {x2}')
-  
-# 		# compute homography
-# 		H2to1 = computeH_norm(x1, x2)
-# 		temp_inliers = np.zeros(N)
-  
-# 		print(f'computeH_ransac >> current H2to1: {H2to1}')
-# 		print(f'computeH_ransac >> temp_inliers: {temp_inliers}')
-  
-# 		# transform the points so we can see where points in locs2 would appear in locs1
-# 		for j in range(len(x2_hom)):
-
-# 			# apply homography transformation
-# 			x2_calc = np.dot(H2to1, x1_hom[j].T)
-
-# 			if x2_calc[2] != 0:
-# 				x2_calc[0] /= x2_calc[2]
-# 				x2_calc[1] /= x2_calc[2]
-    
-# 				error_1 = x2_hom[j][0] - x2_calc[0]
-# 				error_2 = x2_hom[j][1] - x2_calc[1]
-# 				error = np.linalg.norm([error_1, error_2])
-    
-# 				if error <= thres:
-# 					temp_inliers[j] = 1
-# 					total_inliers = total_inliers + 1
-     
-# 		if total_inliers > max_inliers:
-# 			max_inliers = total_inliers
-# 			bestH2to1 = H2to1
-# 			inliers = temp_inliers.copy()
-   
-# 	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
-# 	return bestH2to1, inliers
-
 
 def compositeH(H2to1, template, img):
     # create a mask of the same size as the template
