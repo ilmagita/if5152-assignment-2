@@ -99,21 +99,19 @@ def computeH_norm(x1, x2):
 	print(f'computeH_norm >> finished with H2to1: {H2to1}')
 	return H2to1
 
-def computeH_ransac(locs1, locs2):
+def computeH_ransac(locs1, locs2, iters=1000, thres=4.5):
 	# Q2.2.3
 	# TODO: Compute the best fitting homography given a list of matching points
  
  	# INPUTS
 	# locs1 : N x 2 matrix, each row has (x, y) of a feature point
 	# locs2 : N x 2 matrix, each row has (x, y) of a feature point
+	# iters : max number of iterations
+	# thres : threshold to determine inliers
  
 	# OUTPUTS
 	# bestH2to1 : best homography designated by ransac algorithm
 	# inliers : vector of length N with a 1 at matches
- 
-	# SET VARIABLES
-	iters = 700 # number of RANSAC iterations
-	thres = 2.0 # threshold to determine inliers
  
 	N = len(locs1)
 	inliers = np.zeros((N, 1))
@@ -148,10 +146,22 @@ def computeH_ransac(locs1, locs2):
 		if np.sum(temp_inliers) > np.sum(inliers):
 			inliers = temp_inliers
 			bestH2to1 = H2to1
-	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}')
+   
+	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}\n and inliers_count:{np.sum(inliers == 1)}')
 	return bestH2to1, inliers
 
-def compositeH(H2to1, template, img):
+def compositeH(H2to1, template, img, scale_factor=2.5):
+    # Composites two images
+    
+    # INPUTS
+    # H2to1 : 3 x 3 matrix containing homography
+    # template : template image that will be projected
+    # img : image that will have projected image on top
+    
+    # OUTPUTS
+    # composite_img : template on top of original image
+    
+    template = cv2.resize(template, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
     # create a mask of the same size as the template
     mask = np.ones(template.shape[:2], dtype=np.uint8) * 255
 

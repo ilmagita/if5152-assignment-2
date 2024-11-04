@@ -6,17 +6,15 @@ from helper import computeBrief
 from helper import corner_detection
 import time
 
-def matchPics(I1, I2):
+def matchPics(I1, I2, sigma=0.15, ratio=0.8):
     # adjust sigma and ratio
-	sigma = 1.5
-	ratio = 0.8
+	# sigma = 0.15
+	# ratio = 0.8
 
 	# start timing
 	start_time = time.time()
  
 	# TODO: I1, I2 : Images to match
-	# I1 = cv2.imread(I1)
-	# I2 = cv2.imread(I2)
 
 	# TODO: Convert Images to GrayScale
 	if len(I1.shape) == 3:

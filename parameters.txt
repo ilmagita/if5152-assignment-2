@@ -1,5 +1,7 @@
-# GOOD
---sigma 0.25 --ratio 0.8 --iters 700 --thres 2.0
---sigma 1.5 --ratio 0.8 --iters 700 --thres 2.0
+# KEBENTUK DIKIT
+--sigma 0.25 --ratio 0.8 --iters 700 --thres 2.0 --62 matches, 1 inliers
+--sigma 1.5 --ratio 0.8 --iters 700 --thres 2.0  --62 matches
+--sigma 0.025 --ratio 0.75 --iters 1500 --thres 4.5 --38 matches
 
-# PERFECT
+# MAYAN LAH....
+--sigma 0.15 --ratio 0.9 --iters 1500 --thres 4.5 --117 matches, 2 inliers
