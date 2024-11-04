@@ -1,0 +1,2 @@
+#GOOD PARAMETERS FOR pano_left.jpg and pano_right.jpg
+--sigma 0.15 --ratio 0.8 --iters 1000 --thres 2.0

@@ -16,10 +16,11 @@ def computeH(x1, x2):
     x2 = x2.T
     
     N = len(x1)
+    
     if N < 4:
         raise ValueError('At least 4 points required to compute homography.')
     
-    A = np.zeros([2 * N, 9])
+    A = np.empty([2 * N, 9])
     for i in range(N):
         x1_xi = x1[i, 0] # x coordinate in x1
         x1_yi = x1[i, 1] # y coordinate in x1
@@ -28,7 +29,7 @@ def computeH(x1, x2):
         A[2*i] = [x2_xi, x2_yi, 1, 0, 0, 0, -x1_xi * x2_xi, -x1_xi * x2_yi, -x1_xi]
         A[2*i + 1] = [0, 0, 0, x2_xi, x2_yi, 1, -x1_yi * x2_xi, -x1_yi * x2_yi, -x1_yi]
     
-    _, _, V_t = np.linalg.svd(A.T @ A)
+    _, _, V_t = np.linalg.svd(A)
     smallest_eigenvector = V_t[-1, :]
     H2to1 = smallest_eigenvector.reshape(3,3)
     return H2to1
@@ -44,27 +45,31 @@ def computeH_norm(x1, x2):
 	# OUTPUTS
 	# H2to1 : 3 x 3 matrix; best homography from image 2 to 1 in the least-square sense
  
-	# TODO: Shift so centroid is at the origin
+	# TODO: Shift so centroid is at the origin (NOTE: Done in similarity transform!)
 	# TODO: Normalize the points so that the largest distance from the origin is equal to sqrt(2)
  
 	print('Starting computeH_norm')
 	print(f'computeH_norm >> x1:\n{x1}')
 	print(f'computeH_norm >> x2:\n{x2}')
     
-	mean_x1_x = np.mean(x1, axis = 0)[0]
-	mean_x1_y = np.mean(x1, axis = 0)[0]
-	mean_x2_x = np.mean(x2, axis = 0)[0]
-	mean_x2_y = np.mean(x2, axis = 0)[0]
+	mean_x1_x = np.mean(x1[:,0])
+	mean_x1_y = np.mean(x1[:,1])
+	mean_x2_x = np.mean(x2[:,0])
+	mean_x2_y = np.mean(x2[:,1])
  
-	N = len(x1)
-	s_x1 = np.zeros(N)
-	s_x2 = np.zeros(N)
- 
-	for i in range(N):
-		s_x1[i] = np.sqrt((x1[i, 0] - mean_x1_x) ** 2 + (x1[i, 1] - mean_x1_y) ** 2)
-		s_x2[i] = np.sqrt((x2[i, 0] - mean_x2_x) ** 2 + (x2[i, 1] - mean_x2_y) ** 2)
+	N1 = x1.shape[0]
+	N2 = x2.shape[0]
+	s_x1 = np.empty((N1))
+	s_x2 = np.empty((N2))
 
+	# Get the scaling factor for both x1 and x2
+	for i in range(N1):
+		s_x1[i] = np.sqrt((x1[i, 0] - mean_x1_x) ** 2 + (x1[i, 1] - mean_x1_y) ** 2)
 	x1_scale = np.sqrt(2)/np.amax(s_x1)
+ 
+	for i in range(N2):
+		s_x2[i] = np.sqrt((x2[i, 0] - mean_x2_x) ** 2 + (x1[i, 1] - mean_x1_y) ** 2)
+	x2_scale = np.sqrt(2)/np.amax(s_x2)
 
 	# TODO: Similarity transform 1: scale and shift (translate) the origin
 	# T1 = scaling matrix (dot) translation matrix
@@ -73,24 +78,29 @@ def computeH_norm(x1, x2):
 		[0, x1_scale, -x1_scale * mean_x1_y],
 		[0, 0, 1]
 	])
-	x1_hom = np.hstack((x1, np.ones((len(x1), 1))))
-	print(f'computeH_norm >> x1_hom:\n{x1_hom}')
-	x1_hom = T1 @ x1_hom.T
-	print(f'computeH_norm >> x1_hom after transformed:\n{x1_hom}')
+ 
+	# x1_hom = np.hstack((x1, np.ones((len(x1), 1))))
+	# print(f'computeH_norm >> x1_hom:\n{x1_hom}')
+	# x1_hom = T1 @ x1_hom.T
+	# print(f'computeH_norm >> x1_hom after transformed:\n{x1_hom}')
+	x1_normalized = np.hstack((x1, np.ones((N1, 1))))
+	x1_hom = T1 @ x1_normalized.T
 
 	# TODO: Similarity transform 2
-	x2_scale = np.sqrt(2)/np.amax(s_x2)
 	T2 = np.array([
 		[x2_scale, 0, -x2_scale * mean_x2_x],
 		[0, x2_scale, -x2_scale * mean_x2_y],
 		[0, 0, 1]
 	])
-	x2_hom = np.hstack((x2, np.ones((len(x1), 1))))
-	print(f'computeH_norm >> x2_hom: {x2_hom}')
-	x2_hom = T2 @ x2_hom.T
-	print(f'computeH_norm >> x2_hom after transformed:\n{x2_hom}')
+	# x2_hom = np.hstack((x2, np.ones((len(x1), 1))))
+	# print(f'computeH_norm >> x2_hom: {x2_hom}')
+	# x2_hom = T2 @ x2_hom.T
+	# print(f'computeH_norm >> x2_hom after transformed:\n{x2_hom}')
+	x2_normalized = np.hstack((x2, np.ones((N2, 1))))
+	x2_hom = T2 @ x2_normalized.T
  
 	# TODO: Compute homography
+	# H2to1_normalized = computeH(x1_hom, x2_hom)
 	H2to1_normalized = computeH(x1_hom, x2_hom)
 	print(f'computeH_norm >> H2to1_normalized:\n{H2to1_normalized}')
 
@@ -161,7 +171,6 @@ def compositeH(H2to1, template, img, scale_factor=2.5):
     # OUTPUTS
     # composite_img : template on top of original image
     
-    template = cv2.resize(template, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
     # create a mask of the same size as the template
     mask = np.ones(template.shape[:2], dtype=np.uint8) * 255
 

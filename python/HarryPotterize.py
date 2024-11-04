@@ -28,7 +28,7 @@ print('Done doing matchPics with cv_desk and cv_cover')
 locs1 = locs1[matches[:,0], 0:2]
 locs2 = locs2[matches[:,1], 0:2]
 
-H2to1, inliers = computeH_ransac(locs1, locs2, iters=700, thres=2.0)
+H2to1, inliers = computeH_ransac(locs1, locs2, iters=1000, thres=4.0)
 print('Done computing Homography with RANSAC algorithm')
 
 # warps hp_cover.jpg to the dimension of cv_desk.png using skimage function skimage.transform.warp
