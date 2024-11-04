@@ -65,6 +65,6 @@ def computeBrief(img, locs):
 
 def corner_detection(im, sigma=1.5):
 	# fast method
-	result_img = skimage.feature.corner_fast(im, PATCHWIDTH)
+	result_img = skimage.feature.corner_fast(im, n=PATCHWIDTH, threshold=sigma)
 	locs = skimage.feature.corner_peaks(result_img, min_distance=1)
 	return locs

@@ -29,7 +29,7 @@ def computeH(x1, x2):
         A[2*i] = [x2_xi, x2_yi, 1, 0, 0, 0, -x1_xi * x2_xi, -x1_xi * x2_yi, -x1_xi]
         A[2*i + 1] = [0, 0, 0, x2_xi, x2_yi, 1, -x1_yi * x2_xi, -x1_yi * x2_yi, -x1_yi]
     
-    _, _, V_t = np.linalg.svd(A.T @ A)
+    _, _, V_t = np.linalg.svd(A)
     smallest_eigenvector = V_t[-1, :]
     H2to1 = smallest_eigenvector.reshape(3,3)
     return H2to1
@@ -109,7 +109,7 @@ def computeH_norm(x1, x2):
 	print(f'computeH_norm >> finished with H2to1: {H2to1}')
 	return H2to1
 
-def computeH_ransac(locs1, locs2, iters=700, thres=2.0):
+def computeH_ransac(locs1, locs2, iters=1000, thres=4.5):
 	# Q2.2.3
 	# TODO: Compute the best fitting homography given a list of matching points
  
@@ -129,11 +129,10 @@ def computeH_ransac(locs1, locs2, iters=700, thres=2.0):
  
 	for i in range(iters):
 		# pick 4 random points
-		idx = np.random.choice(N, size=4, replace=False)
+		idx = np.random.randint(0, N, size = 4)
 		x1 = locs1[idx]
 		x2 = locs2[idx]
-		print(f'computeH_ransac >> x1 chosen: {x1}')
-		print(f'computeH_ransac >> x2 chosen: {x2}')
+  
 		# compute homography
 		H2to1 = computeH_norm(x1, x2)
 		temp_inliers = np.zeros((N, 1))
