@@ -48,9 +48,9 @@ def computeH_norm(x1, x2):
 	# TODO: Shift so centroid is at the origin (NOTE: Done in similarity transform!)
 	# TODO: Normalize the points so that the largest distance from the origin is equal to sqrt(2)
  
-	print('Starting computeH_norm')
-	print(f'computeH_norm >> x1:\n{x1}')
-	print(f'computeH_norm >> x2:\n{x2}')
+	# print('Starting computeH_norm')
+	# print(f'computeH_norm >> x1:\n{x1}')
+	# print(f'computeH_norm >> x2:\n{x2}')
     
 	mean_x1_x = np.mean(x1[:,0])
 	mean_x1_y = np.mean(x1[:,1])
@@ -102,11 +102,11 @@ def computeH_norm(x1, x2):
 	# TODO: Compute homography
 	# H2to1_normalized = computeH(x1_hom, x2_hom)
 	H2to1_normalized = computeH(x1_hom, x2_hom)
-	print(f'computeH_norm >> H2to1_normalized:\n{H2to1_normalized}')
+	# print(f'computeH_norm >> H2to1_normalized:\n{H2to1_normalized}')
 
 	# TODO: Denormalization
 	H2to1 = np.linalg.inv(T2) @ H2to1_normalized @ T1
-	print(f'computeH_norm >> finished with H2to1: {H2to1}')
+	# print(f'computeH_norm >> finished with H2to1: {H2to1}')
 	return H2to1
 
 def computeH_ransac(locs1, locs2, iters=700, thres=2.0):
@@ -132,8 +132,8 @@ def computeH_ransac(locs1, locs2, iters=700, thres=2.0):
 		idx = np.random.choice(N, size=4, replace=False)
 		x1 = locs1[idx]
 		x2 = locs2[idx]
-		print(f'computeH_ransac >> x1 chosen: {x1}')
-		print(f'computeH_ransac >> x2 chosen: {x2}')
+		# print(f'computeH_ransac >> x1 chosen: {x1}')
+		# print(f'computeH_ransac >> x2 chosen: {x2}')
 		# compute homography
 		H2to1 = computeH_norm(x1, x2)
 		temp_inliers = np.zeros((N, 1))
@@ -158,7 +158,7 @@ def computeH_ransac(locs1, locs2, iters=700, thres=2.0):
 			inliers = temp_inliers.T
 			bestH2to1 = H2to1
    
-	print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}\n and inliers_count:{np.sum(inliers == 1)}')
+	# print(f'computeH_ransac: finished with bestH2to1: {bestH2to1} and inliers: {inliers}\n and iters: {iters} and threshold: {thres}\n and inliers_count:{np.sum(inliers == 1)}')
 	return bestH2to1, inliers
 
 def compositeH(H2to1, template, img):
