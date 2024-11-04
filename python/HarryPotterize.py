@@ -29,11 +29,11 @@ locs2 = locs2[matches[:,1], 0:2]
 H2to1, inliers = computeH_ransac(locs1, locs2)
 print('Done computing Homography with RANSAC algorithm')
 
-# Warps hp_cover.jpg to the dimension of cv_desk.png using skimage function skimage.transform.warp
+# warps hp_cover.jpg to the dimension of cv_desk.png using skimage function skimage.transform.warp
 warped_img = cv2.warpPerspective(hp_cover_resized, H2to1, dsize=(cv_desk.shape[1], cv_desk.shape[0]))
-cv2.imwrite('../results/HarryPotter_made.jpg', warped_img)
-cv2.imshow('HarryPotter_made', warped_img)
+cv2.imwrite('../results/HarryPotter_projected.jpg', warped_img)
 
-composite_img = compositeH(H2to1, hp_cover_resized, cv_desk)
+# composite warped harry potter into desk cv_desk.jpg
+composite_img = compositeH(H2to1, hp_cover, cv_desk)
 cv2.imwrite('../results/composite_harryPotter_desk.jpg', composite_img) 
 

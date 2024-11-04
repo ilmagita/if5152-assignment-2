@@ -1,2 +1,5 @@
+# GOOD
 --sigma 0.25 --ratio 0.8 --iters 700 --thres 2.0
 --sigma 1.5 --ratio 0.8 --iters 700 --thres 2.0
+
+# PERFECT
