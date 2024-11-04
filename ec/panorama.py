@@ -21,19 +21,19 @@ width = round(max(im2_W, im1_W) * 1.2)
 adjusted_right = cv2.copyMakeBorder(pano_right, 0, im2_H - im1_H, width - im2_W, 0, cv2.BORDER_CONSTANT, 0)
 
 # Select Matching Points
-matches, locs1, locs2 = matchPics(pano_left, adjusted_right, sigma=3.0, ratio=0.8)
+matches, locs1, locs2 = matchPics(pano_left, adjusted_right, sigma=0.15, ratio=1.0)
 # plotMatches(pano_left, adjusted_right, matches, locs1, locs2)
 
 locs1 = locs1[matches[:, 0], 0:2]
 locs2 = locs2[matches[:, 1], 0:2]
 
 # Stitch Images Together
-bestH2to1, _ = computeH_ransac(locs1, locs2, iters=1000, thres=4.0)
+bestH2to1, inliers = computeH_ransac(locs1, locs2, iters=700, thres=20)
 panorama_stitched = compositeH(bestH2to1, pano_left, adjusted_right)
 panorama = np.maximum(adjusted_right, panorama_stitched)
 
 cv2.imwrite('results/panorama_stitched_own.jpg', panorama)
 
 end_time = time()
-print(f'and {len(matches)} matches.')
+print(f'and {np.sum(inliers==1)} inliers.')
 print(f'Finished panorama.py in {end_time - start_time} seconds.')
