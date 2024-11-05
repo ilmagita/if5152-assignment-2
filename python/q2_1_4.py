@@ -11,13 +11,18 @@ def plotMatches(im1,im2,matches,locs1,locs2, output_path):
     im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
     plt.axis('off')
     skimage.feature.plot_matches(ax,im1,im2,locs1,locs2,matches,matches_color='r',only_matches=True)
+    
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0, dpi=150)
 
 cv_cover = cv2.imread('../data/cv_cover.jpg')
 cv_desk = cv2.imread('../data/cv_desk.png')
 
-for ratio in [0.6]:
-    for i in [0.1]:
+# SAVING RESULTS AUTOMATICALLY TO results FOLDER
+ratio_arr = [0.6]   # ratios to try out
+sigma_arr = [0.1]   # sigmas to try out
+
+for ratio in ratio_arr:
+    for i in sigma_arr:
         try:
             matches, locs1, locs2 = matchPics(cv_cover, cv_desk, sigma=i, ratio=ratio)
             if len(matches) > 0:

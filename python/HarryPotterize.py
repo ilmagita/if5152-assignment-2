@@ -55,8 +55,8 @@ def HarryPotterize(ratio, sigma, locs1, locs2, iters, matches_count, thres):
     print(f'HarryPotterize done in {hp_end_time - hp_start_time:.3f} seconds')
     
 ## VARIABLES
-ratio_arr = [0.7, 0.7]
-sigma_arr = [0.15, 0.05] # must be the same length as sigma_arr
+ratio_arr = [0.7]
+sigma_arr = [0.15] # must be the same length as sigma_arr
 
 iters_arr = [1000, 1000, 500, 500]
 thres_arr = [50, 30, 50, 30]   # must be the same length as iters_arr
