@@ -26,7 +26,7 @@ for ratio in ratio_arr:
         try:
             matches, locs1, locs2 = matchPics(cv_cover, cv_desk, sigma=i, ratio=ratio)
             if len(matches) > 0:
-                output_path = (f'../results/plotMatches/plotMatches_ratio_{ratio}_sigma_{i:.2f}.jpg')
+                output_path = (f'../results/plotMatches_ratio_{ratio}_sigma_{i:.2f}.jpg')
                 plotMatches(cv_cover, cv_desk, matches, locs1, locs2, output_path)
         except IndexError as e:
             print(f'IndexError occurred for ratio={ratio} and sigma={i}: {e}')

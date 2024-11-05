@@ -50,7 +50,7 @@ def HarryPotterize(ratio, sigma, locs1, locs2, iters, matches_count, thres):
     # cv2.imwrite(f'../results/HarryPotter/projected/projected_r{ratio}_s{sigma}_i{iters}_t{thres}.jpg', warped_img)
     print(f'Number of inliers: {np.sum(inliers == 1)}')
     composite_img = compositeH(H2to1, hp_cover_resized, cv_desk)
-    cv2.imwrite(f'../results/HarryPotter/desk_r{ratio}_s{sigma}_i{iters}_t{thres}.jpg', composite_img)
+    cv2.imwrite(f'../results/desk_r{ratio}_s{sigma}_i{iters}_t{thres}.jpg', composite_img)
     hp_end_time = time()
     print(f'HarryPotterize done in {hp_end_time - hp_start_time:.3f} seconds')
     
