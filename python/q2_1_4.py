@@ -16,12 +16,12 @@ def plotMatches(im1,im2,matches,locs1,locs2, output_path):
 cv_cover = cv2.imread('../data/cv_cover.jpg')
 cv_desk = cv2.imread('../data/cv_desk.png')
 
-for ratio in [0.51, 0.52, 0.53, 0.54]:
-    for i in [0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09]:
+for ratio in [0.6]:
+    for i in [0.1]:
         try:
             matches, locs1, locs2 = matchPics(cv_cover, cv_desk, sigma=i, ratio=ratio)
             if len(matches) > 0:
-                output_path = (f'../results/plotMatches/ratio_{ratio}/plotMatches_ratio_{ratio}_sigma_{i:.2f}.jpg')
+                output_path = (f'../results/plotMatches/plotMatches_ratio_{ratio}_sigma_{i:.2f}.jpg')
                 plotMatches(cv_cover, cv_desk, matches, locs1, locs2, output_path)
         except IndexError as e:
             print(f'IndexError occurred for ratio={ratio} and sigma={i}: {e}')

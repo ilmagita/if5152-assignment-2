@@ -44,7 +44,8 @@ book_W = book.shape[2]
 
 composite_frames = []
 
-# Open the log file
+# open the log file
+
 with open('ar_output.txt', 'w') as log_file:
     log_file.write(f'Starting Augmented Reality processing...\n\n')
     

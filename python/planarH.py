@@ -52,10 +52,10 @@ def computeH_norm(x1, x2):
 	# print(f'computeH_norm >> x1:\n{x1}')
 	# print(f'computeH_norm >> x2:\n{x2}')
     
-	mean_x1_x = np.mean(x1[:,0])
-	mean_x1_y = np.mean(x1[:,1])
-	mean_x2_x = np.mean(x2[:,0])
-	mean_x2_y = np.mean(x2[:,1])
+	mean_x1_x = np.mean(x1[:, 0])
+	mean_x1_y = np.mean(x1[:, 1])
+	mean_x2_x = np.mean(x2[:, 0])
+	mean_x2_y = np.mean(x2[:, 1])
  
 	N1 = x1.shape[0]
 	N2 = x2.shape[0]
@@ -72,7 +72,6 @@ def computeH_norm(x1, x2):
 	x2_scale = np.sqrt(2)/np.amax(s_x2)
 
 	# TODO: Similarity transform 1: scale and shift (translate) the origin
-	# T1 = scaling matrix (dot) translation matrix
 	T1 = np.array([
 		[x1_scale, 0, -x1_scale * mean_x1_x],
 		[0, x1_scale, -x1_scale * mean_x1_y],
@@ -100,7 +99,6 @@ def computeH_norm(x1, x2):
 	x2_hom = T2 @ x2_normalized.T
  
 	# TODO: Compute homography
-	# H2to1_normalized = computeH(x1_hom, x2_hom)
 	H2to1_normalized = computeH(x1_hom, x2_hom)
 	# print(f'computeH_norm >> H2to1_normalized:\n{H2to1_normalized}')
 
